@@ -1,0 +1,70 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Auth helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == "dilshodallaberdiyev57@gmail.com" ||
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin"
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // --- Tables ---
+    match /tables/{tableId} {
+      allow get: if true;
+      allow list: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // --- Categories ---
+    match /categories/{categoryId} {
+      allow get: if true;
+      allow list: if true;
+      allow write: if isAdmin();
+    }
+
+    // --- Menu Items ---
+    match /menuItems/{itemId} {
+      allow get: if true;
+      allow list: if true;
+      allow write: if isAdmin();
+    }
+
+    // --- Orders ---
+    match /orders/{orderId} {
+      allow get: if isAdmin() || (isSignedIn() && resource.data.tableId == request.auth.uid);
+      allow create: if true; 
+      allow update: if isAdmin();
+      allow list: if isAdmin();
+    }
+
+    // --- Waiter Calls ---
+    match /waiterCalls/{callId} {
+      allow get: if isAdmin();
+      allow create: if true;
+      allow update: if isAdmin();
+      allow list: if isAdmin();
+    }
+
+    // --- Users ---
+    match /users/{phone} {
+      allow get: if true; // Needed to check if phone exists during login/reg
+      allow create: if true;
+      allow update: if isAdmin() || (isSignedIn() && request.auth.uid == phone);
+      allow list: if isAdmin();
+    }
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "entities": {
+    "table": {
+      "title": "Table",
+      "description": "A restaurant table with a unique QR code link.",
+      "type": "object",
+      "properties": {
+        "number": { "type": "string" },
+        "status": { "type": "string", "enum": ["available", "occupied", "dirty"] },
+        "qrCodeData": { "type": "string" }
+      },
+      "required": ["number", "status"]
+    },
+    "category": {
+      "title": "Menu Category",
+      "description": "Categories for menu items (e.g., Starters, Main, Drinks).",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "order": { "type": "integer" }
+      },
+      "required": ["name", "order"]
+    },
+    "menuItem": {
+      "title": "Menu Item",
+      "description": "Individual food or drink items.",
+      "type": "object",
+      "properties": {
+        "categoryId": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "price": { "type": "number" },
+        "imageUrl": { "type": "string" },
+        "isAvailable": { "type": "boolean" },
+        "salesCount": { "type": "integer" }
+      },
+      "required": ["categoryId", "name", "price", "isAvailable"]
+    },
+    "order": {
+      "title": "Order",
+      "description": "A customer order submitted from a table.",
+      "type": "object",
+      "properties": {
+        "tableId": { "type": "string" },
+        "items": { "type": "array" },
+        "total": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "preparing", "served", "cancelled"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["tableId", "items", "total", "status", "createdAt"]
+    },
+    "waiterCall": {
+      "title": "Waiter Call",
+      "description": "A signal from a customer that they need assistance.",
+      "type": "object",
+      "properties": {
+        "tableId": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "resolved"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["tableId", "status", "createdAt"]
+    },
+    "user": {
+      "title": "User",
+      "description": "User profiles including staff and admins.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "staff", "customer"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "phone", "role"]
+    }
+  },
+  "firestore": {
+    "tables": {
+      "schema": "table",
+      "description": "Collection of physical tables in the restaurant."
+    },
+    "categories": {
+      "schema": "category",
+      "description": "Collection of menu categories."
+    },
+    "menuItems": {
+      "schema": "menuItem",
+      "description": "Collection of food and drink items."
+    },
+    "orders": {
+      "schema": "order",
+      "description": "Collection of customer orders."
+    },
+    "waiterCalls": {
+      "schema": "waiterCall",
+      "description": "Collection of waiter call requests."
+    },
+    "users": {
+      "schema": "user",
+      "description": "Collection of registered users."
+    }
+  }
+}
